@@ -2,9 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
-//#include <boost/tuple/tuple.hpp>
 #include "gnuplot-iostream.h"
-//#include "gnuplot.h"
 
 /******************************************
  *
@@ -46,8 +44,6 @@ int main() {
         for (int j = 0; j < nr; j++) {
             xval = dx * i - 1.0;
             yval = dx * j - 1.0;
-            //xcor[i][j] = xval;
-            //ycor[i][j] = yval;
             fout[i][j] = fun(xval, yval);
         }
     }
