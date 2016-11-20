@@ -2,7 +2,9 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+//#include <boost/tuple/tuple.hpp>
 #include "gnuplot-iostream.h"
+//#include "gnuplot.h"
 
 /******************************************
  *
@@ -21,15 +23,6 @@ double fun(double x, double y) {
     return val;
 }
 
-template<typename T>
-std::vector<T> flatten(const std::vector< std::vector<T> > &orig)
-{
-    std::vector<T> ret;
-    for(const auto &v: orig)
-        ret.insert(ret.end(), v.begin(), v.end());
-    return ret;
-}
-
 int main() {
     //nr is # of row, nc # of column, chose to be the same for convenience.
     int nr = 51;
@@ -44,6 +37,8 @@ int main() {
         for (int j = 0; j < nr; j++) {
             xval = dx * i - 1.0;
             yval = dx * j - 1.0;
+            //xcor[i][j] = xval;
+            //ycor[i][j] = yval;
             fout[i][j] = fun(xval, yval);
         }
     }
@@ -80,6 +75,8 @@ int main() {
         */
     }
     Gnuplot gp;
+    gp << "set dgrid3d\n";
+    gp << "set pm3d\n";
     gp << "set contour\n";
     gp << "splot '-' matrix" << '\n';
     gp.send(unew);
