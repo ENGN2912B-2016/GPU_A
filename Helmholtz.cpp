@@ -4,6 +4,7 @@
 #include <cmath>
 //#include <boost/tuple/tuple.hpp>
 #include "gnuplot-iostream.h"
+//#include "gnuplot.h"
 
 /******************************************
  *
@@ -15,12 +16,20 @@
  *
  * ***************************************/
 
-
 // function used to calculate RHS of the eq.
 double fun(double x, double y) {
     double val;
     val = sin(M_PI*x) * sin(M_PI*y);
     return val;
+}
+
+template<typename T>
+std::vector<T> flatten(const std::vector< std::vector<T> > &orig)
+{
+    std::vector<T> ret;
+    for(const auto &v: orig)
+        ret.insert(ret.end(), v.begin(), v.end());
+    return ret;
 }
 
 int main() {
@@ -37,6 +46,8 @@ int main() {
         for (int j = 0; j < nr; j++) {
             xval = dx * i - 1.0;
             yval = dx * j - 1.0;
+            //xcor[i][j] = xval;
+            //ycor[i][j] = yval;
             fout[i][j] = fun(xval, yval);
         }
     }
@@ -72,14 +83,13 @@ int main() {
         unew[nc][nc] *= (4.0/dx/dx + 1);
         */
     }
+    Gnuplot gp;
+    gp << "set contour\n";
+    gp << "splot '-' matrix" << '\n';
+    gp.send(unew);
+    gp.flush();
+    sleep(5);
+
     std::cout << "iteration: " << count << std::endl;
-    std::ofstream out;
-    out.open("uend.txt");
-    for (int i = 0; i < nc; i++) {
-        for (int j = 0; j < nr; j++) {
-            out << unew[i][j] << ' ';
-        }
-        out << '\n';
-    }
     return 0;
 }
