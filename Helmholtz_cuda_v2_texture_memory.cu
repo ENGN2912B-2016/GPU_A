@@ -64,7 +64,7 @@ __global__ void error1(float *c, int nc, int nr) {
 
 }
 
-__global__ void evolve(float *unew,  float dx, int nc, int nr) { // initial state filling
+__global__ void evolve(float *unew, bool flag, float dx, int nc, int nr) { // initial state filling
       
     int idx = threadIdx.x + blockIdx.x*blockDim.x ; // 1D-grid of pixels, each one being a problem unknown
     int left, right, top, bottom;
@@ -79,11 +79,22 @@ __global__ void evolve(float *unew,  float dx, int nc, int nr) { // initial stat
         right = idx + 1;
         top = idx - nc;
         bottom = idx + nc;
-        t = tex1Dfetch(tex_uold,top);
-        l = tex1Dfetch(tex_uold,left);
-        r = tex1Dfetch(tex_uold,right);
-        b = tex1Dfetch(tex_uold,bottom);
-        cur = tex1Dfetch(tex_fout,idx);
+        if (flag) {
+          t = tex1Dfetch(tex_uold,top);
+          l = tex1Dfetch(tex_uold,left);
+          r = tex1Dfetch(tex_uold,right);
+          b = tex1Dfetch(tex_uold,bottom);
+          cur = tex1Dfetch(tex_fout,idx);
+        }
+        else{
+          t = tex1Dfetch(tex_unew,top);
+          l = tex1Dfetch(tex_unew,left);
+          r = tex1Dfetch(tex_unew,right);
+          b = tex1Dfetch(tex_unew,bottom);
+          cur = tex1Dfetch(tex_fout,idx);
+
+        }
+        
         unew[idx] = (t + b + l + r) - dx*dx*cur;
         unew[idx] /= (4 + dx*dx);
     
@@ -137,10 +148,14 @@ int main(int argc, char** argv) {
     int count = 0;
     
     float c = 1;
+    bool flag = 1;
     while(count < Mloop && sqrt(c) >= error){
         count += 1;
-        evolve<<<blocksPerGrid, threadsPerBlock>>>(d_unew, dx, nc, nr);
-        std::swap( d_uold, d_unew );
+        if (flag)
+          evolve<<<blocksPerGrid, threadsPerBlock>>>(d_unew, flag, dx, nc, nr);
+        else
+          evolve<<<blocksPerGrid, threadsPerBlock>>>(d_uold, flag, dx, nc, nr);
+        flag = !flag;
         if (count % 500 == 499){
         error1<<<blocksPerGrid, threadsPerBlock>>>( dev_partial_c, nc, nr);
         cudaMemcpy( partial_c, dev_partial_c, blocksPerGrid*sizeof(float), cudaMemcpyDeviceToHost ) ;
@@ -155,7 +170,7 @@ int main(int argc, char** argv) {
     }
     
 
-   //copy the memeory back 
+    //copy the memeory back 
     
     cudaEventRecord( stop, 0 );
     cudaEventSynchronize( stop );
