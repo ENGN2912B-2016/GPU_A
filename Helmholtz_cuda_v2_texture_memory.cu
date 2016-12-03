@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
     }
     
 
-    //copy the memeory back 
+   //copy the memeory back 
     
     cudaEventRecord( stop, 0 );
     cudaEventSynchronize( stop );
