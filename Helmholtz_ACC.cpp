@@ -71,14 +71,15 @@ int main(int argc, char** argv) {
 // Obtain the solution in current iteration
     
     #pragma acc data copy(uold,fout), create(unew)
-    while ( err > tol && iter < iter_max){
+    while ( sqrt(err) > tol && iter < iter_max){
         
       #pragma acc kernels
       {
         err = 0.0;
         #pragma omp parallel for shared(nr,nc,unew,uold,fout)
         for (int i = 1; i < nc - 1; i++) {
-            #pragma acc loop gang(8) vector(32)
+            #pragma acc loop gang(8) vector(32)\
+             reduction(+:err)
             for (int j = 1; j < nr - 1; j++) {
                 unew[i][j] = (uold[i+1][j] + uold[i-1][j] + uold[i][j-1] + uold[i][j+1]) - dx*dx*fout[i][j];
                 unew[i][j] /= (4.0 + dx*dx);
