@@ -2,9 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
-//#include <boost/tuple/tuple.hpp>
 #include "gnuplot-iostream.h"
-//#include "gnuplot.h"
 
 /******************************************
  *
@@ -13,6 +11,10 @@
  *
  * current bc's is 0 at four laterals of
  * the square domain
+ *
+ * To compile: download gnuplot-iostream.h
+ * and type sh compile.sh in your command line.
+ * make sure you have boost library installed.
  *
  * ***************************************/
 
