@@ -125,14 +125,8 @@ int main(){
     int localRowN = localRC.first;
     int localColN = localRC.second;
 
+    // find your neighbours
     std::vector<int> nei = GetNeigh(nrow,ncol,rank);
-/*    std::cout << "This is rank: " << rank << ". My neighbour are ";
-    for (int i = 0; i < 4; i++)
-        std::cout << nei[i] << ' ';
-    std::cout << std::endl;*/
-    // cout infomation
-/*    std::cout << "This is rank: " << rank << ", row ID: " << rowID << ", col ID: " << colID
-        << ", local row number: " << localRowN << ", local col number: " << localColN << std::endl;*/
 
     // store the info from your neighbourings
     double *uleft = new double[localRowN], *uright = new double[localRowN];
@@ -287,7 +281,6 @@ int main(){
         }
     }
     out.close();
-    // find your neighbours
     MPI_Barrier( MPI_COMM_WORLD);
     delete[] udown;
     delete[] uup;
