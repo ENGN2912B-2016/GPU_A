@@ -2,7 +2,9 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+//#include <boost/tuple/tuple.hpp>
 #include "gnuplot-iostream.h"
+//#include "gnuplot.h"
 
 /******************************************
  *
@@ -11,10 +13,6 @@
  *
  * current bc's is 0 at four laterals of
  * the square domain
- *
- * To compile: download gnuplot-iostream.h
- * and type sh compile.sh in your command line.
- * make sure you have boost library installed.
  *
  * ***************************************/
 
@@ -77,12 +75,14 @@ int main() {
         */
     }
     Gnuplot gp;
+    gp << "set terminal png\n";
     gp << "set dgrid3d\n";
     gp << "set pm3d\n";
     gp << "set contour\n";
+    gp << "set output 'mygraph.png'\n";
     gp << "splot '-' matrix" << '\n';
     gp.send(unew);
-    gp.flush();
+    //gp.flush();
     sleep(5);
 
     std::cout << "iteration: " << count << std::endl;
