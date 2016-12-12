@@ -1,15 +1,21 @@
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <cmath>
 #include <stdlib.h>
 #include <algorithm> 
 
 #define imin(a,b) (a<b?a:b)
-const int threadsPerBlock = 256;
-texture<float> tex_fout;
+//using texture memory for uold and unew
 texture<float> tex_uold;
 texture<float> tex_unew;
+//input parameters 
+//using 1D threads and blocks 
+struct pars {
+  int threadsPerBlock;
+  int blocksPerGrid;
+  int nr;//nr = nc is the number of mesh points on each side of the 2*2 square domain
+  int nc;
+};
 
 
 __device__ float fun(float x, float y) { 
@@ -34,12 +40,12 @@ __global__ void init(float *d_fout, float *d_unew, float *d_uold, float dx, int 
 }
 
 }
-//solve function
 
 
+//caculate error, error is defined as the L2 norm of (unew - uold)
 __global__ void error1(float *c, int nc, int nr) {
-  __shared__ float cache[threadsPerBlock];
-  int idx = threadIdx.x + blockIdx.x*blockDim.x ; // 2D-grid of pixels, each one being a problem unknown
+  __shared__ float cache[256];
+  int idx = threadIdx.x + blockIdx.x*blockDim.x ; // 1D-grid of pixels, each one being a problem unknown
   int cacheIndex = threadIdx.x;
    float sum = 0;
     while(idx < nr*nc) {
@@ -64,7 +70,8 @@ __global__ void error1(float *c, int nc, int nr) {
 
 }
 
-__global__ void evolve(float *unew, bool flag, float dx, int nc, int nr) { // initial state filling
+// slove unew given uold
+__global__ void evolve(float *fout, float *unew, bool flag, float dx, int nc, int nr) { // initial state filling
       
     int idx = threadIdx.x + blockIdx.x*blockDim.x ; // 1D-grid of pixels, each one being a problem unknown
     int left, right, top, bottom;
@@ -79,19 +86,19 @@ __global__ void evolve(float *unew, bool flag, float dx, int nc, int nr) { // in
         right = idx + 1;
         top = idx - nc;
         bottom = idx + nc;
-        if (flag) {
+        if (flag) {//fetch texture memory 
           t = tex1Dfetch(tex_uold,top);
           l = tex1Dfetch(tex_uold,left);
           r = tex1Dfetch(tex_uold,right);
           b = tex1Dfetch(tex_uold,bottom);
-          cur = tex1Dfetch(tex_fout,idx);
+          cur = fout[idx];
         }
         else{
           t = tex1Dfetch(tex_unew,top);
           l = tex1Dfetch(tex_unew,left);
           r = tex1Dfetch(tex_unew,right);
           b = tex1Dfetch(tex_unew,bottom);
-          cur = tex1Dfetch(tex_fout,idx);
+          cur = fout[idx];
 
         }
         
@@ -104,31 +111,86 @@ __global__ void evolve(float *unew, bool flag, float dx, int nc, int nr) { // in
     }
 }  
 
+//check if input parameters are in correct range, throw error if not 
+pars init_pars(int nr, int threads, int blocks){
+    pars inputpars;
+    if (nr <= 31){
+      throw "mesh size should not be less than 31 to get accurate results";
+    }    
+    else if (nr%2 == 0){
+      nr = nr+1;
+    }
+
+    if (threads > 256){
+      throw "threads per block should not be greater than 256";
+    }
+
+    if (blocks > 65535){
+      throw "blocks per grid should not be greater than 65535";
+    }
+   
+   inputpars.nr = nr;
+   inputpars.nc = nr;
+   inputpars.blocksPerGrid = blocks;
+   inputpars.threadsPerBlock = threads;
+   return inputpars;
+}
+
 
 
 int main(int argc, char** argv) {
+  //using 1D threads and blocks 
   
-  int nr, nc;
-      
-    if(argc>1){
-     nr = atoi( argv[1] );
-     nc = atoi( argv[2] );
-   }
-    else{
-     nr = 201;
-     nc = 201;
+//default parameters
+  
+  int nr = 501;
+     float N = float(nr)*float(nr);
+     int threads = 256;
+     int blocks = imin( 10000, (N+threads-1) / threads );
+ 
+  
+     switch (argc) {
+           
+        case 4:    blocks = atoi( argv[3] ); 
+        case 3 :   threads = atoi( argv[2] );
+        case 2 :   nr = atoi( argv[1] );
+                    break;
+        case 1 :    std::cin >> nr >> threads >> blocks;
+                    break;
+        default :   std::cerr << "Bad number of input parameters!" << std::endl;
+                    return(-1);
     }
 
-    float N = float(nr)*float(nc);
-    int blocksPerGrid = imin( 32, (N+threadsPerBlock-1) / threadsPerBlock );
+    if (argc == 2){
+      N = float(nr)*float(nr);
+      threads = 256;
+      blocks = imin( 10000, (N+threads-1) / threads );
+     }
+//error handling
+     pars inputpars;
+     try{
+      inputpars = init_pars(nr, threads, blocks);
+      }catch (const char* msg) {
+      std::cerr << msg << std::endl;
+      return 0;
+   }
+     
+     nr = inputpars.nr;
+     int nc = nr;
+     int blocksPerGrid = inputpars.blocksPerGrid;
+     int threadsPerBlock = inputpars.threadsPerBlock;
+     N = float(nr)*float(nc);
+
+     //runtime counter
   
     cudaEvent_t start, stop;
     cudaEventCreate( &start );
     cudaEventCreate( &stop );
     cudaEventRecord( start, 0 );
-
-    int Mloop = 1e5;
-    float error = 1e-10;
+    
+    int Mloop = 1e5;//largest iteration times
+    float error = 1e-5;//convergence criterion
+    //allocate memory
     float  *unew, *d_uold, *d_unew, *d_fout, *dev_partial_c, *partial_c;
     unew = (float*)malloc(N*sizeof(float));
     partial_c = (float*)malloc(blocksPerGrid*sizeof(float));
@@ -137,26 +199,34 @@ int main(int argc, char** argv) {
     cudaMalloc(&d_fout, N*sizeof(float)); 
     cudaMalloc(&dev_partial_c, blocksPerGrid*sizeof(float)) ;
 
-    cudaBindTexture( NULL, tex_fout, d_fout, N*sizeof(float) );
     cudaBindTexture( NULL, tex_uold, d_uold, N*sizeof(float) );
     cudaBindTexture( NULL, tex_unew, d_unew, N*sizeof(float) );
+
+    
     
     
     float dx = 2.0/static_cast<float>(nc - 1);
-   
+    //initialization
     init<<<blocksPerGrid, threadsPerBlock>>>(d_fout, d_unew, d_uold, dx, nc, nr);//initialize 
+    cudaEventRecord( stop, 0 );
+    cudaEventSynchronize( stop );
+    float elapsedTime;
+    cudaEventElapsedTime( &elapsedTime, start, stop );
+    printf( "init runtime: %3.1f ms\n", elapsedTime );
+
     int count = 0;
     
     float c = 1;
     bool flag = 1;
+    cudaEventRecord( start, 0 );
     while(count < Mloop && sqrt(c) >= error){
         count += 1;
         if (flag)
-          evolve<<<blocksPerGrid, threadsPerBlock>>>(d_unew, flag, dx, nc, nr);
+          evolve<<<blocksPerGrid, threadsPerBlock>>>(d_fout, d_unew, flag, dx, nc, nr);
         else
-          evolve<<<blocksPerGrid, threadsPerBlock>>>(d_uold, flag, dx, nc, nr);
+          evolve<<<blocksPerGrid, threadsPerBlock>>>(d_fout, d_uold, flag, dx, nc, nr);
         flag = !flag;
-        if (count % 500 == 499){
+        if (count % 500 == 499){//check error every 500 steps
         error1<<<blocksPerGrid, threadsPerBlock>>>( dev_partial_c, nc, nr);
         cudaMemcpy( partial_c, dev_partial_c, blocksPerGrid*sizeof(float), cudaMemcpyDeviceToHost ) ;
         c = 0;
@@ -164,7 +234,6 @@ int main(int argc, char** argv) {
             c += partial_c[i];
       //      std::cout << "error: " << partial_c[i] << std::endl;
          }
-         c = c / N;
        }
               
     }
@@ -174,12 +243,11 @@ int main(int argc, char** argv) {
     
     cudaEventRecord( stop, 0 );
     cudaEventSynchronize( stop );
-    float elapsedTime;
     cudaEventElapsedTime( &elapsedTime, start, stop );
     printf( "runtime: %3.1f ms\n", elapsedTime );
 
     cudaEventRecord( start, 0 );
-    cudaMemcpy(unew, d_unew, N*sizeof(float), cudaMemcpyDeviceToHost);
+    cudaMemcpy(unew, d_unew, N*sizeof(float), cudaMemcpyDeviceToHost);//copy results back to cpu
     cudaEventRecord( stop, 0 );
     cudaEventSynchronize( stop );
     cudaEventElapsedTime( &elapsedTime, start, stop );
@@ -198,14 +266,14 @@ int main(int argc, char** argv) {
     }
 
 
-    
+//free memory
     cudaFree( d_uold );
     cudaFree( d_unew );
     cudaFree( d_fout );
     cudaFree( dev_partial_c );
+//unbind texure memory 
     cudaUnbindTexture( tex_uold );
     cudaUnbindTexture( tex_unew );
-    cudaUnbindTexture( tex_fout );
     cudaEventDestroy( start );
     cudaEventDestroy( stop );
     free( unew );
