@@ -5,6 +5,18 @@
 #include <iomanip>
 #include <vector>
 
+/*******************************
+ * mpi code using jacobi algorithm
+ * to solve Helmholtz equation
+ *
+ * to compile, run:
+ * mpic++ -o exefile parallel_jacobi.cpp
+ *
+ * to run with multiple processors, run:
+ * mpirun -n ncol*nrow(in the code) exefile
+ *
+ * the out file documents the final unew matrix.
+ * *****************************/
 std::pair<int,int> GetRankID(int r, int col) {
     std::pair<int,int> rankID;
     rankID.first = r / col;
@@ -81,7 +93,7 @@ int main(){
     out.open("out.txt");
 
     int nrow = 1, ncol = 4;
-    int N = 12;
+    int N = 51;
     double hL = 1, L = 2;
     double *unew = new double[N*N];
     double *u = new double[N*N];
