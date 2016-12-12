@@ -220,7 +220,6 @@ int main(){
         MPI_Allreduce(&localerr, &errsum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
         errsum = sqrt(errsum);
 
-        // it seems this step does not work...
         // transfer data by arrays
         double *u0temp = new double[localRowN], *u2temp = new double[localRowN];
         double *u1temp = new double[localColN], *u3temp = new double[localColN];
@@ -247,8 +246,9 @@ int main(){
         delete[] u1temp;
         delete[] u3temp;
     }
-    // transfer data from different procs to rank 0 after calculations
-
+    
+    // transfer data from different procs to rank 0 after error reaches
+    // tolerance
     if (rank != 0) {
         for (int i = 0; i < localRowN; i++) {
             for (int j = 0; j < localColN; j++) {
