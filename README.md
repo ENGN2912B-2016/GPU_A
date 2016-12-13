@@ -1,13 +1,9 @@
-[Instruction]
-1) an introduction and overview of the project for new users, 
-2) detailed step-by-step instructions on how to build the project on the CCV, 
-and 
-3) instructions explaining how to run your program with example input and expected output.
-
-
-
-
-
+We build an equation solver for Helmholtz equation, and accelerated it using MPI parallel and GPU algorithm.
+Our work consists of four parts:
+* MPI-Accelerated Solver
+* CUDA-Accelerated Solver
+* OpenACC-Accelerated Solver
+* GUI App of the Solver
 
 
 
