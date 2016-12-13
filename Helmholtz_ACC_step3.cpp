@@ -1,13 +1,12 @@
 // GPU acceleration based on OpenACC directives
 // to solve Helmholtz problem has been implemented.
 //
-// This is the final version of the code, below features
+// This is the step 3 version of the code, below features
 // are presented:
 //
 // 1. Parallel loop in OpenACC
 // 2. Collapse loops to use longer vectors
 // 3. Manage data movement
-// 4. Change number of gangs and workers
 //
 // By Shihong Li, Dec 2016
 
@@ -64,7 +63,6 @@ int main(int argc, char** argv) {
     while ( sqrt(err) > tol && iter < iter_max){
         err = 0.0;
         #pragma acc parallel loop collapse(2) reduction(+:err)\
-         gang worker num_workers(4) vector_length(32)
              #pragma omp parallel for shared(nr, nc, unew, uold,fout)
             for (int i = 1; i < nc - 1; i++) {
                 for (int j = 1; j < nr - 1; j++) {
@@ -74,7 +72,6 @@ int main(int argc, char** argv) {
             }
         // Swap the new solution to the old solution sets for next iteration
         #pragma acc parallel loop collapse(2) \
-        gang worker num_workers(4) vector_length(32)
              #pragma omp parallel for shared(nr, nc, unew, uold,fout)
             for (int i = 1; i < nc - 1; i++) {
                 for (int j = 1; j < nr - 1; j++) {
