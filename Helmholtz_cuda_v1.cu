@@ -1,3 +1,4 @@
+//by Xiuqi Li 2016/12
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -14,7 +15,6 @@ struct pars {
   int nr;//nr = nc is the number of mesh points on each side of the 2*2 square domain
   int nc;
 };
-
 
 
 __device__ float fun(float x, float y) {
