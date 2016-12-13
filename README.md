@@ -20,8 +20,10 @@ Work done by Yixiang Deng.
 [Helmholtz Equation]
 
 \begin{equation}
-\Delta^2 u + u = \sin(\pi x)\sin(\pi y)
+\nabla^2 u + u = \sin(\pi x)\sin(\pi y)
 \end{equation}
+
+(note: enable extension GitHub with MathJax in Chrome to see equation clearly.)
 
 A 2D Helmholtz equation is studied in this project, which is a solved by Jacobi iteration method.
 
