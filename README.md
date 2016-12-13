@@ -19,7 +19,9 @@ Work done by Yixiang Deng.
 
 [Helmholtz Equation]
 
-$\Delta^2 u + u = \sin(\pi x)\sin(\pi y)$
+\begin{equation}
+\Delta^2 u + u = \sin(\pi x)\sin(\pi y)
+\end{equation}
 
 A 2D Helmholtz equation is studied in this project, which is a solved by Jacobi iteration method.
 
