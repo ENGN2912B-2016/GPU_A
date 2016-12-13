@@ -1,6 +1,6 @@
 We build an equation solver for Helmholtz equation, and accelerated it using MPI parallel and GPU algorithm.
 Our work consists of four parts:
-* MPI-Accelerated Solver
+* Serial Solver and MPI-Accelerated Solver
 * CUDA-Accelerated Solver
 * OpenACC-Accelerated Solver
 * GUI App of the Solver
@@ -38,6 +38,7 @@ To compile, make sure boost library is installed in your laptop or loaded on ccv
 When compiling on ccv, make sure you type 
 
    $ module load boost
+   
    $ module load gnuplot
 
 
