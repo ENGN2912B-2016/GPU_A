@@ -19,14 +19,14 @@ Work done by Yixiang Deng.
 
 [Helmholtz Equation]
 
-$\Delta^2 u + u = \sin(2\pi x)\sin(2\pi y)$
+$\Delta^2 u + u = \sin(\pi x)\sin(\pi y)$
 
 A 2D Helmholtz equation is studied in this project, which is a solved by Jacobi iteration method.
 
 
 [Jacobi Algorithm]
 
-Unlike SOR or Gauss-Seidel method, Jacobi iteration method only uses the value calculated in last step, namely array/matrix uold or u in the cpp files written by Yixiang Deng and newly calculated values are stored in array/matrix unew, respectively. And consequently, Jacobi iteration is more feasible when parallelized.
+Unlike SOR or Gauss-Seidel method, Jacobi iteration method only uses the value calculated in last step, namely array/matrix uold or u in the cpp files written by Yixiang Deng and updated values are stored in array/matrix unew, respectively. And consequently, Jacobi iteration is more feasible when parallelizing an iteration method.
 
 
 ********************************
@@ -52,9 +52,9 @@ To run, type
 
   $ ./h.out 101
   
-  ,where the second argument other than the executable file, should be odd to assure the origin locating at (0,0), is the number of nodes user would like to use in the grid, since both dimension use the same number of nodes, we just need one input value.
+  ,where the second argument, 101 in this case, should be odd to assure the origin locating at (0,0), is the number of nodes user would like to use in the grid, since both dimensions use the same number of nodes, we just need one input value.
 
-After running, there will be two main outputs, one is the mygraph.png, which plots the final contour and surface plot of unew, another is the out.txt, which contains the numerical results of unew.
+After running, there will be two outputs, one is the mygraph.png, which plots the final contour and surface plot of unew, another is the out.txt, which contains the numerical results of unew. The exact iteration will shown on the screen too.
 
 
 [(MPI) parallel_jacobi.cpp]
@@ -67,15 +67,15 @@ Then, type
 
   $ mpic++ -o exe_file parallel_jacobi.cpp
   
-and then an exe_file will be created.
+ afterwards, an exe_file will be created.
 
 To run the executive file, type 
 
   $ mpirun -n nproc exe_file 101
   
-  where the nproc represents the number pf processor the user would like to use and should be an even number, the argument right after exe_file is the number of nodes in each dimension similar to what is explained above.
+  where 'nproc' represents the number of processor the user would like to use and should be an even number, the argument right after exe_file is the number of nodes in both dimensions, again should be odd, similar to what is explained above.
 
-After running, the screen will output some information of running, like the exact error, number of iteration and wall-time of each processor. Furthermore, there will be a out.txt, which contains the numerical results of unew.
+After running, the screen will output some information regarding this run, like the exact error, number of iterations and wall-time of each processor. Furthermore, there will be a out.txt, which contains the numerical results of unew.
 
 
 
