@@ -64,7 +64,6 @@ int main(int argc, char* argv[]) {
     }
     Gnuplot gp;
     gp << "set terminal png\n";
-    gp << "set dgrid3d\n";
     gp << "set pm3d\n";
     gp << "set contour\n";
     gp << "set output 'mygraph.png'\n";
