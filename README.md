@@ -9,50 +9,70 @@ Our work consists of four parts:
 
 
 =========================================
-=========[MPI-Accelerated Solver]========
+=========[Basic Solver and MPI-Accelerated Solver]========
 =========================================
 Work done by Yixiang Deng.
 
  ********************************
  *Introduction and Overview*
- ********************************
 
-1) introduce Helmholtz equation and Jacobi algorithm,
-2) explain the functionality of a serial cpp file which enable invoking gnuplot-iostream from executable file,
-3) show how to compile a mpi file, run with user-defined number of cores
-and number of nodes with result documented in a txt file named out,
-4) number of iterations and error tolerance can be modified in the cpp files but not user-defined,
-5) cpp files are tested in OS X system and runs smoothly.
 
-###############################################
-##############Helmholtz Equation###############
-###############################################
-$$\Delta^2 u + u = \sin(2\pi x)\sin(2\pi y)$$
+#Helmholtz Equation
+
+$\Delta^2 u + u = \sin(2\pi x)\sin(2\pi y)$
+
 A 2D Helmholtz equation is studied in this project, which is a solved by Jacobi iteration method.
 
-###############################################
-##############Jacobi Algorithm#################
-###############################################
+
+#Jacobi Algorithm
+
 Unlike SOR or Gauss-Seidel method, Jacobi iteration method only uses the value calculated in last step, namely array/matrix uold or u in the cpp files written by Yixiang Deng and newly calculated values are stored in array/matrix unew, respectively. And consequently, Jacobi iteration is more feasible when parallelized.
 
-###############################################
-############(Serial) Helmholtz.cpp#############
-###############################################
-To compile, make sure boost library is installed in your laptop or loaded on ccv.
-When compile on ccv, make sure you type “load boost; load gnuplot;” additionally to g++ tools.
-After this, type “sh compile.sh” in command line, you will get a executable file named “h.out”.
 
-To run, type “./h.out 101”, where the second argument other than executable file, should be odd to assure the origin locating at (0,0), is the number of nodes user would like to use in the grid, since both dimension use the same number of nodes, we just need one input value.
+********************************
+ *Instruction on Compilation and How to Run Code*
+
+#(Serial) Helmholtz.cpp
+
+To compile, make sure boost library is installed in your laptop or loaded on ccv.
+When compiling on ccv, make sure you type 
+
+   $ module load boost
+   $ module load gnuplot
+
+
+After this, type 
+
+  $ sh compile.sh
+  
+Then you will get a executable file named “h.out”.
+
+To run, type 
+
+  $ ./h.out 101
+  
+  ,where the second argument other than the executable file, should be odd to assure the origin locating at (0,0), is the number of nodes user would like to use in the grid, since both dimension use the same number of nodes, we just need one input value.
 
 After running, there will be two main outputs, one is the mygraph.png, which plots the final contour and surface plot of unew, another is the out.txt, which contains the numerical results of unew.
 
-###############################################
-###########(MPI) parallel_jacobi.cpp###########
-###############################################
-To compile, make sure mpi libraries are installed. i.e. when typing “mpic++ “ and “mpirun” in the command line, it does not give out error like “command not found”.
-Then, type “mpic++ -o exe_file parallel_jacobi.cpp”, an exe_file will be created.
 
-To run, type “mpirun -n nproc exe_file 101”, where the nproc represents the number pf processor the user would like to use and should be an even number, the argument right after exe_file is the number of nodes in each dimension similar to what is explained above.
+#(MPI) parallel_jacobi.cpp
+
+Log on CCV and type
+
+  $ module load mpich
+
+Then, type 
+
+  $ mpic++ -o exe_file parallel_jacobi.cpp
+  
+and then an exe_file will be created.
+
+To run the executive file, type 
+
+  $ mpirun -n nproc exe_file 101
+  
+  where the nproc represents the number pf processor the user would like to use and should be an even number, the argument right after exe_file is the number of nodes in each dimension similar to what is explained above.
 
 After running, the screen will output some information of running, like the exact error, number of iteration and wall-time of each processor. Furthermore, there will be a out.txt, which contains the numerical results of unew.
 
@@ -90,7 +110,9 @@ are used in the latter.
  *Instruction on Compilation*
  
 For compilation on CCV at Brown University, log on CCV and use the following bash command:
+
   $ module load cuda/7.5.18
+  
   $ nvcc -o [output executable file name] [filename of the cuda code]
 
 
@@ -104,10 +126,12 @@ Users can specify three parameters:
 
 If the any of the 3 parameters are not specified, default will be used(check code to see how the default is caculated). 
 For 1d version, type in 
+
   $ ./[name of the output file] [number of points in each dimension] [threads per block] [blocks per grid] 
 to run. 
 
 For 2d version, type in 
+
   $./[name of the output file] [number of points in each dimension] [threads per block in each dimension] [blocks per grid in dimension] 
 to run.
 
