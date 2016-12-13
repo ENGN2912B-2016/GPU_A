@@ -25,7 +25,7 @@ Work done by Yixiang Deng.
 
 (note: enable extension GitHub with MathJax in Chrome to see equation clearly.)
 
-A 2D Helmholtz equation is studied in this project, which is a solved by Jacobi iteration method.
+A 2D Helmholtz equation is studied in this project, which is solved by Jacobi iteration method.
 
 
 [Jacobi Algorithm]
