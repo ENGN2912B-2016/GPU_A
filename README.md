@@ -9,7 +9,7 @@ Our work consists of four parts:
 
 
 =========================================
-=========[Basic Solver and MPI-Accelerated Solver]========
+======[Serial Solver and MPI-Accelerated Solver]=====
 =========================================
 Work done by Yixiang Deng.
 
@@ -17,14 +17,14 @@ Work done by Yixiang Deng.
  *Introduction and Overview*
 
 
-#Helmholtz Equation
+[Helmholtz Equation]
 
 $\Delta^2 u + u = \sin(2\pi x)\sin(2\pi y)$
 
 A 2D Helmholtz equation is studied in this project, which is a solved by Jacobi iteration method.
 
 
-#Jacobi Algorithm
+[Jacobi Algorithm]
 
 Unlike SOR or Gauss-Seidel method, Jacobi iteration method only uses the value calculated in last step, namely array/matrix uold or u in the cpp files written by Yixiang Deng and newly calculated values are stored in array/matrix unew, respectively. And consequently, Jacobi iteration is more feasible when parallelized.
 
@@ -32,7 +32,7 @@ Unlike SOR or Gauss-Seidel method, Jacobi iteration method only uses the value c
 ********************************
  *Instruction on Compilation and How to Run Code*
 
-#(Serial) Helmholtz.cpp
+[(Serial) Helmholtz.cpp]
 
 To compile, make sure boost library is installed in your laptop or loaded on ccv.
 When compiling on ccv, make sure you type 
@@ -56,7 +56,7 @@ To run, type
 After running, there will be two main outputs, one is the mygraph.png, which plots the final contour and surface plot of unew, another is the out.txt, which contains the numerical results of unew.
 
 
-#(MPI) parallel_jacobi.cpp
+[(MPI) parallel_jacobi.cpp]
 
 Log on CCV and type
 
