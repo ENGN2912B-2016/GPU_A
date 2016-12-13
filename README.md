@@ -14,7 +14,7 @@ Our work consists of four parts:
 
 Work done by Xiuqi Li.
 
- ********************************
+********************************
  *Introduction and Overview*
 
 Our CUDA-accelerated Helmholtz equation solvers includes: 
@@ -33,7 +33,7 @@ The difference between v1 and v1_2d (or v2 and v2_2d) is that 2d blocks and thre
 are used in the latter. 
 
 
- ********************************
+********************************
  *Instruction on Compilation*
  
 For compilation on CCV at Brown University, log on CCV and use the following bash command:
@@ -74,7 +74,7 @@ Example:
 
 Work done by Shihong Li.
 
- ********************************
+********************************
  *Introduction and Overview*
 
  OpenACC is a very simple directive-type code for GPU acceleration. Usually programmers can use four steps to optimize their speed-up goal, and we reflect our solver in our code as follows: 
@@ -85,7 +85,7 @@ Work done by Shihong Li.
  Thus, our team decide to walk through these four steps and present all the codes by above four steps.
 
 
- ********************************
+********************************
  *Instruction on Compilation*
 
 For example, for Helmholtz_ACC_step1.cpp,
