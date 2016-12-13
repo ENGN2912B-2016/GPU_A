@@ -2,7 +2,6 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
-//#include <boost/tuple/tuple.hpp>
 #include "gnuplot-iostream.h"
 //#include "gnuplot.h"
 
@@ -23,10 +22,15 @@ double fun(double x, double y) {
     return val;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     //nr is # of row, nc # of column, chose to be the same for convenience.
     int nr = 51;
-    int nc = nr;
+    int nc, ncores;
+
+    ncores = atoi(argv[2]);
+    nr = atoi(argv[1]);
+    nc = nr;
+
     std::vector< std::vector<double> > uold, unew, fout;
     uold.resize(nr, std::vector<double>(nc,0.0));
     unew.resize(nr, std::vector<double>(nc,0.0));
@@ -82,8 +86,6 @@ int main() {
     gp << "set output 'mygraph.png'\n";
     gp << "splot '-' matrix" << '\n';
     gp.send(unew);
-    //gp.flush();
-    sleep(5);
 
     std::cout << "iteration: " << count << std::endl;
     return 0;
