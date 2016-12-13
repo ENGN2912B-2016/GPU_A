@@ -19,9 +19,9 @@ Work done by Yixiang Deng.
 
 [Helmholtz Equation]
 
-\begin{equation}
+\begin{equation*}
 \nabla^2 u + u = \sin(\pi x)\sin(\pi y)
-\end{equation}
+\end{equation*}
 
 (note: enable extension GitHub with MathJax in Chrome to see equation clearly.)
 
