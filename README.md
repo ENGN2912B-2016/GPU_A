@@ -182,7 +182,7 @@ Then you shall see acceleration information presented first and if this code is 
 *How to Run Code*
 
 After compiling, type the following code into command line:
-  $ Export=PGI_ACC_TIME=1 && ./Helmholtz_step1.
+  $ Export PGI_ACC_TIME=1 && ./Helmholtz_step1.
 
 Then you shall directly see the calculating results presented every 1000 steps, the left column stands for the current iteration steps and the right column stands for the current square root error.  After that you shall see the total runtime presented in the end, together with detailed time usage shown right below, i.e, how much time is spent on GPU calculating, how much on data transferring and how much on CPU.
 
