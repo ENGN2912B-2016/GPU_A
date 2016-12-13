@@ -26,7 +26,8 @@ int main(int argc, char* argv[]) {
     //nr is # of row, nc # of column, chose to be the same for convenience.
     int nr = 51;
     int nc, ncores;
-
+    std::fstream out;
+    out.open("out.txt");
     ncores = atoi(argv[2]);
     nr = atoi(argv[1]);
     nc = nr;
@@ -48,7 +49,7 @@ int main(int argc, char* argv[]) {
     }
 
     int Mloop = 1e4, count = 0;
-    double error = 1e-3, sum = 1.0;
+    double error = 1e-5, sum = 1.0;
     while (sqrt(sum) > error && count < Mloop){
         sum = 0.0;
         count += 1;
@@ -58,25 +59,8 @@ int main(int argc, char* argv[]) {
                 unew[i][j] /= (4 + dx*dx);
                 sum += pow((unew[i][j] - uold[i][j]),2);
                 uold[i][j] = unew[i][j];
-            }/*
-            unew[0][i] = (uold[1][i] + uold[nc][i] + uold[0][i-1] + uold[0][i+1])/dx/dx - fout[0][i];
-            unew[0][i] = (4.0/dx/dx + 1) * unew[0][i];
-            unew[nc][i] = (uold[1][i] + uold[nc - 1][i] + uold[nc][i-1] + uold[nc][i+1])/dx/dx - fout[nc][i];
-            unew[nc][i] = (4.0/dx/dx + 1) * unew[nc][i];
-            sum += pow((unew[0][j] - uold[0][j]),2);
-            sum += pow((unew[nc][j] - uold[nc][j]),2);*/
-            //std::cout << '\n';
+            }
         }
-        /*
-        unew[0][0] = (uold[1][0] + uold[nc][0] + uold[0][nc] + uold[nc][0])/dx/dx - fout[0][0];
-        unew[0][0] *= (4.0/dx/dx + 1);
-        unew[0][nc] = (uold[1][nc] + uold[0][nc - 1] + uold[0][0] + uold[nc][nc])/dx/dx - fout[0][nc];
-        unew[0][nc] *= (4.0/dx/dx + 1);
-        unew[nc][0] = (uold[nc - 1][0] + uold[0][0] + uold[nc][nc] + uold[nc][1])/dx/dx - fout[nc][0];
-        unew[nc][0] *= (4.0/dx/dx + 1);
-        unew[nc][nc] = (uold[nc][0] + uold[nc][nc - 1] + uold[0][nc] + uold[nc - 1][nc])/dx/dx - fout[nc][nc];
-        unew[nc][nc] *= (4.0/dx/dx + 1);
-        */
     }
     Gnuplot gp;
     gp << "set terminal png\n";
@@ -84,9 +68,16 @@ int main(int argc, char* argv[]) {
     gp << "set pm3d\n";
     gp << "set contour\n";
     gp << "set output 'mygraph.png'\n";
-    gp << "splot '-' matrix" << '\n';
+    gp << "splot '-' matrix with lines\n";
     gp.send(unew);
 
-    std::cout << "iteration: " << count << std::endl;
+    for (int i = 0; i< nr; i++) {
+        for (int j = 0; j < nc; j++) {
+            out << unew[i][j] << ' ';
+        }
+        out << '\n';
+    }
+    out.close();
+    std::cout << "iteration: " << count << " Error: " << sqrt(sum) << std::endl;
     return 0;
 }
