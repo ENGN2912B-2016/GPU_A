@@ -28,7 +28,6 @@ int main(int argc, char* argv[]) {
     int nc, ncores;
     std::fstream out;
     out.open("out.txt");
-    ncores = atoi(argv[2]);
     nr = atoi(argv[1]);
     nc = nr;
 
