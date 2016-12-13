@@ -225,7 +225,7 @@ int main(int argc, char** argv) {
 
     std::cout << "iteration: " << count << std::endl;
     std::ofstream out;
-    out.open("uend.txt");
+    out.open("uend_v1_2d.txt");
     
     for (int i = 0; i < nc; i++) {
         for (int j = 0; j < nr; j++) {
