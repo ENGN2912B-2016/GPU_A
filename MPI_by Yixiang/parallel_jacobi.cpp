@@ -290,7 +290,7 @@ int main(){
     delete[] u;
     delete[] fout;
     MPI_Finalize();
-    out.close();
+   // out.close();
     return 0;
 }
 
